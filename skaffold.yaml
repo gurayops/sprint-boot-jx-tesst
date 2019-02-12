@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/gurayyildirim/sprint-boot-jx-tesst:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/gurayyildirim/sprint-boot-jx-tesst:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: sprint-boot-jx-tesst
+        chartPath: charts/sprint-boot-jx-tesst
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/gurayyildirim/sprint-boot-jx-tesst'
+          image.tag: '{{.DIGEST_HEX}}'
